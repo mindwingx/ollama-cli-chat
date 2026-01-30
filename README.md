@@ -29,7 +29,7 @@ Perfect if you want:
 
 Download the correct binary for your system:
 
-- **macOS (Apple Silicon):** `arm64`
+- **MacOS (Apple Silicon):** `arm64`
 - **Linux:** `amd64`
 - **Windows:** (Clone the project and build it for your target architecture.)
 
@@ -84,7 +84,7 @@ Add the following line to your shell config:
 - or any other shell profile you use
 
 ```bash
-export OLLAMA_BASE_URL=http://<OLLAMA_IP>:11434
+export OLLAMA_BASE_URL=http://<NETWORK_IP>:<PORT>
 ```
 
 Apply the changes:
@@ -115,10 +115,6 @@ services:
     volumes:
       - ./ollama-v:/root/.ollama
     restart: unless-stopped
-
-
-volumes:
-  ollama:
 ```
 
 Start Ollama:
