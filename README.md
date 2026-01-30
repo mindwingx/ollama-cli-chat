@@ -33,10 +33,10 @@ Download the correct binary for your system:
 - **Linux:** `amd64`
 - **Windows:** (Clone the project and build it for your target architecture.)
 
-Download the binary from the **Releases** section.
+Download the binary
 
-**[Download Binary (Linux amd64)](./ollama-chat-cli-amd64)**<br>
-**[Download Binary (Max arm64)](./ollama-chat-cli-arm64)**
+**[Download Binary (Linux amd64)](https://raw.githubusercontent.com/mindwingx/ollama-cli-chat/refs/heads/main/ollama-cli-chat-amd64)**<br>
+**[Download Binary (Mac arm64)](https://raw.githubusercontent.com/mindwingx/ollama-cli-chat/refs/heads/main/ollama-cli-chat-arm64)**
 
 
 ---
@@ -56,6 +56,20 @@ Ensure `~/bin` is in your `$PATH`:
 ```bash
 export PATH="$HOME/bin:$PATH"
 ```
+
+**MacOS** 
+
+Apple's Gatekeeper blocks apps from unidentified developers by default.<br>
+This is a security feature, not necessarily an indication of malware.
+
+Steps to Run It:
+- Go to System Settings → Privacy & Security
+- Scroll down to Security section
+- Look for a message like: *"ollama-cli-chat-arm64" was blocked...* or "ol" was blocked... (if you renamed it)
+- Click "Allow Anyway"
+- Confirm with your password/Touch ID
+
+![](./macos.png)
 
 ---
 
