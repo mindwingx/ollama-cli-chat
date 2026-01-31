@@ -10,11 +10,6 @@ import (
 	"strings"
 )
 
-const (
-	hideCursor = "\x1b[?25l"
-	showCursor = "\x1b[?25h"
-)
-
 type Chat struct {
 	std *pkg.Std
 	api prv.IOllamaProvider
@@ -78,44 +73,40 @@ func (c *Chat) GetModelsList() (res domain.Models, err error) {
 }
 
 func (c *Chat) PullModel(model string) (err error) {
-	fmt.Println(hideCursor)
-	defer fmt.Println(showCursor)
+	fmt.Println(pkg.HideCursor)
+	defer fmt.Println(pkg.ShowCursor)
 
 	payload := prv.ModelRequest{Model: model}
 
 	ctx, streamChan, errChan := c.api.PullModel(payload)
 
+	loading := pkg.Loader(ctx)
+
 	var (
-		status   string  = ""
-		total    int64   = 0
+		status           = ""
+		file             = pkg.NewBytes()
 		progress float64 = 0
 	)
 
 	for {
-
 		select {
 		case err = <-errChan:
-			if err != nil {
-				fmt.Print("\r")
-				c.std.Err(err.Error())
-			}
-
 			return
 		case resp := <-streamChan:
 			statusChunks := strings.Split(resp.Status, " ")
 			status = statusChunks[0]
 
 			if strings.HasPrefix(resp.Status, "pulling") == true {
-				if total == 0 {
-					total = toMb(resp.Total)
+				if file.Bytes() == 0 {
+					file.SetSize(resp.Total)
 				}
 
-				if total > 0 && total == toMb(resp.Total) && resp.Completed > 0 {
+				if file.Bytes() > 0 && file.Bytes() == resp.Total && resp.Completed > 0 {
 					progress = float64((resp.Completed * 100) / resp.Total)
 				}
 			}
 
-			if total > 0 && (total == toMb(resp.Completed) || status == "success") {
+			if file.Bytes() > 0 && (file.Bytes() == resp.Completed || status == "success") {
 				progress = 100.00
 			}
 
@@ -123,10 +114,10 @@ func (c *Chat) PullModel(model string) (err error) {
 				status = "process"
 			}
 
-			fmt.Print(fmt.Sprintf("\r⚓️ %s - %dMB(%.f%%)", status, total, progress))
+			fmt.Print(fmt.Sprintf("\r%s %s - %.2f %s(%.f%%)", <-loading, status, file.Size(), file.Unit(), progress))
 		case <-ctx.Done():
 			fmt.Print("\r")
-			fmt.Print(fmt.Sprintf("\r⚓️ success - %dMB(100%%)%s", total, strings.Repeat(" ", 10)))
+			fmt.Print(fmt.Sprintf("\r⣿️ success - %.2f %s(100%%)%s", file.Size(), file.Unit(), strings.Repeat(" ", 10)))
 			fmt.Print("\n\n")
 			return
 		}
@@ -137,10 +128,4 @@ func (c *Chat) DeleteModel(model string) (err error) {
 	payload := prv.ModelRequest{Model: model}
 	err = c.api.DeleteModel(payload)
 	return
-}
-
-// HELPERS
-
-func toMb(bytes int64) int64 {
-	return bytes / (1024 * 1204)
 }

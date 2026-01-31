@@ -4,13 +4,9 @@ import (
 	"context"
 	"fmt"
 	"ollama-cli/internal/core/domain"
+	"ollama-cli/pkg"
 	"strings"
 	"time"
-)
-
-const (
-	hideCursor = "\x1b[?25l"
-	showCursor = "\x1b[?25h"
 )
 
 type SendMessage struct {
@@ -69,7 +65,7 @@ func sendMessage(s *SendMessage, p *Process) {
 	//
 
 	answer, err := p.api.SendChatMessage(p.Model(), p.Role(), proof, p.Stream())
-	fmt.Print(showCursor)
+	fmt.Print(pkg.ShowCursor)
 	cancel()
 
 	if err != nil {
@@ -171,7 +167,7 @@ func requestLoader(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			fmt.Print(hideCursor)
+			fmt.Print(pkg.HideCursor)
 			fmt.Print(fmt.Sprintf("\r♻️ Thinking%s ", strings.Repeat(".", dotsCount)))
 
 			time.Sleep(300 * time.Millisecond)

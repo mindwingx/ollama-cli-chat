@@ -45,7 +45,8 @@ Download the binary
 
 ```bash
 mkdir -p ~/bin
-mv ollama-cli-chat ~/bin/ol
+mv ollama-cli-chat-("set arch name") ol
+mv ol ~/bin/
 chmod +x ~/bin/ol
 ```
 

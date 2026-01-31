@@ -2,10 +2,16 @@ package pkg
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"os"
 	"strings"
 	"time"
+)
+
+const (
+	HideCursor = "\x1b[?25l"
+	ShowCursor = "\x1b[?25h"
 )
 
 type Std struct {
@@ -92,5 +98,34 @@ func (s *Std) Err(err string) {
 	fmt.Print(fmt.Sprintf("%s %s\n\n", emoji, err))
 	s.emoji = ""
 
-	time.Sleep(1500 * time.Millisecond)
+	time.Sleep(900 * time.Millisecond)
+}
+
+//
+
+func Loader(ctx context.Context) <-chan string {
+	loaders := []string{"⠀", "⠂", "⠆", "⠇", "⠧", "⠷", "⠿", "⡿", "⣿"}
+	loaderChan := make(chan string, 1)
+
+	go func() {
+		defer close(loaderChan)
+		index := 0
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				time.Sleep(400 * time.Millisecond)
+
+				if index++; index > len(loaders)-1 {
+					index = 1
+				}
+
+				loaderChan <- loaders[index]
+			}
+		}
+	}()
+
+	return loaderChan
 }
